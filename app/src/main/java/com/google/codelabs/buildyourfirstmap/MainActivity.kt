@@ -30,6 +30,7 @@ import com.google.maps.android.ktx.addCircle
 import com.google.maps.android.ktx.addMarker
 import com.google.maps.android.ktx.awaitMap
 import com.google.maps.android.ktx.awaitMapLoad
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity() {
             // Ensure all places are visible in the map
             val bounds = LatLngBounds.builder()
             places.forEach { bounds.include(it.latLng) }
+
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 20))
         }
     }
