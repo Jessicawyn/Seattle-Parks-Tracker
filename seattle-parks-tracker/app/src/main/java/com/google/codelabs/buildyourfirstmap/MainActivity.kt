@@ -26,6 +26,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -104,6 +105,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         btn.setOnClickListener {
             getLastLocation()
         }
+
 
     }
     // [END maps_android_add_map_codelab_ktx_coroutines]

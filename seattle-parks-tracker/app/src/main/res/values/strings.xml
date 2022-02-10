@@ -15,5 +15,5 @@
 -->
 
 <resources>
-  <string name="app_name">Seattle Parks Tracker</string>
+    <string name="app_name">Seattle Parks Tracker</string>
 </resources>
