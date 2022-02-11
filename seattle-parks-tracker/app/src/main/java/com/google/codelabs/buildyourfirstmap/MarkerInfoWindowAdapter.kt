@@ -18,11 +18,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.codelabs.buildyourfirstmap.place.Place
 
 class MarkerInfoWindowAdapter(private val context: Context) : GoogleMap.InfoWindowAdapter {
+    val placesVisitedTracker = PlacesVisitedTracker()
+
     override fun getInfoContents(marker: Marker?): View? {
         // 1. Get tag
         val place = marker?.tag as? Place ?: return null
@@ -32,6 +35,8 @@ class MarkerInfoWindowAdapter(private val context: Context) : GoogleMap.InfoWind
         view.findViewById<TextView>(R.id.text_view_title).text = place.name
         view.findViewById<TextView>(R.id.text_view_address).text = place.address
         view.findViewById<TextView>(R.id.text_view_rating).text = "Rating: %.2f".format(place.rating)
+        view.findViewById<SwitchCompat>(R.id.switch_id).isChecked = placesVisitedTracker.hasVisitedPlace(place.locID)
+        //TODO() Add Listen oncheck change listen --> call function to update storage
 
         return view
     }
