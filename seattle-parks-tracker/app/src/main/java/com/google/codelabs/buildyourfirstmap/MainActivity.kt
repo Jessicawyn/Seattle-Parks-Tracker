@@ -125,7 +125,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Set custom info window adapter
         clusterManager.markerCollection.setInfoWindowAdapter(MarkerInfoWindowAdapter(this))
-
+        clusterManager.markerCollection.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
+            override fun onInfoWindowClick(marker: Marker?) {
+                val place = marker?.tag as? Place ?: return
+                place.visited = !place.visited
+                marker.showInfoWindow()
+            }
+        })
         // Add the places to the ClusterManager
         clusterManager.addItems(places)
         clusterManager.cluster()

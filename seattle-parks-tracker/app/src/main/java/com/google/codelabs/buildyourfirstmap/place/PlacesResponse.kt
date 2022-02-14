@@ -30,5 +30,6 @@ fun PlaceResponse.toPlace(): Place = Place(
     name = name,
     latLng = LatLng(lat, lng),
     address = vicinity,
-    rating = rating
+    rating = rating,
+    visited = false
 )

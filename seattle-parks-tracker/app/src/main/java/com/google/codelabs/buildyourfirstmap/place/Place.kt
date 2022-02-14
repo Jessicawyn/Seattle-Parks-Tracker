@@ -22,7 +22,8 @@ data class Place(
     val name: String,
     val latLng: LatLng,
     val address: String,
-    val rating: Float
+    val rating: Float,
+    var visited: Boolean
 ) : ClusterItem {
     override fun getPosition(): LatLng =
         latLng
