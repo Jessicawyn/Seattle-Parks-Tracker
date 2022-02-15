@@ -15,6 +15,8 @@
 package com.google.codelabs.buildyourfirstmap.place
 
 import android.content.Context
+import androidx.preference.PreferenceManager
+import com.google.codelabs.buildyourfirstmap.MainActivity
 import com.google.codelabs.buildyourfirstmap.R
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -40,8 +42,9 @@ class PlacesReader(private val context: Context) {
     fun read(): List<Place> {
         val itemType = object : TypeToken<List<PlaceResponse>>() {}.type
         val reader = InputStreamReader(inputStream)
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         return gson.fromJson<List<PlaceResponse>>(reader, itemType).map {
-            it.toPlace()
+            it.toPlace(preferences)
         }
     }
 }

@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -125,11 +126,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Set custom info window adapter
         clusterManager.markerCollection.setInfoWindowAdapter(MarkerInfoWindowAdapter(this))
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         clusterManager.markerCollection.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
             override fun onInfoWindowClick(marker: Marker?) {
                 val place = marker?.tag as? Place ?: return
                 place.visited = !place.visited
                 marker.showInfoWindow()
+                val editor = preferences.edit()
+                if (place.visited && !preferences.getBoolean(place.locID, false))
+                    editor.putBoolean(place.locID, true)
+                else if(!place.visited && preferences.getBoolean(place.locID, false))
+                    editor.remove(place.locID)
+                editor.apply()
             }
         })
         // Add the places to the ClusterManager
@@ -292,6 +300,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // What must happen when permission is granted
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == pERMISSION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 getLastLocation()

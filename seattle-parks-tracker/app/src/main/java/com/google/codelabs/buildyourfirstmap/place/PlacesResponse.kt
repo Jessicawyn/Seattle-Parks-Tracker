@@ -14,6 +14,7 @@
 
 package com.google.codelabs.buildyourfirstmap.place
 
+import android.content.SharedPreferences
 import com.google.android.gms.maps.model.LatLng
 
 data class PlaceResponse(
@@ -25,11 +26,11 @@ data class PlaceResponse(
     val rating: Float
 )
 
-fun PlaceResponse.toPlace(): Place = Place(
+fun PlaceResponse.toPlace(preferences: SharedPreferences): Place = Place(
     locID = locID,
     name = name,
     latLng = LatLng(lat, lng),
     address = vicinity,
     rating = rating,
-    visited = false
+    visited = preferences.getBoolean(locID, false)
 )
