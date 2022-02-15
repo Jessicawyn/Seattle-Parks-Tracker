@@ -25,6 +25,9 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -62,6 +65,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Current location is set to India, this will be of no use
     var currentLocation: LatLng = LatLng(20.5, 78.9)
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.switch_list -> {
+                startActivity(Intent(this, ParkListActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     // [START maps_android_add_map_codelab_ktx_coroutines]
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,29 +137,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addClusteredMarkers(googleMap: GoogleMap) {
         // Create the ClusterManager class and set the custom renderer
         val clusterManager = ClusterManager<Place>(this, googleMap)
-        clusterManager.renderer =
-            PlaceRenderer(
-                this,
-                googleMap,
-                clusterManager
-            )
+        val renderer = PlaceRenderer(
+            this,
+            googleMap,
+            clusterManager
+        )
+        clusterManager.renderer = renderer
 
         // Set custom info window adapter
         clusterManager.markerCollection.setInfoWindowAdapter(MarkerInfoWindowAdapter(this))
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        clusterManager.markerCollection.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
-            override fun onInfoWindowClick(marker: Marker?) {
-                val place = marker?.tag as? Place ?: return
-                place.visited = !place.visited
-                marker.showInfoWindow()
-                val editor = preferences.edit()
-                if (place.visited && !preferences.getBoolean(place.locID, false))
-                    editor.putBoolean(place.locID, true)
-                else if(!place.visited && preferences.getBoolean(place.locID, false))
-                    editor.remove(place.locID)
-                editor.apply()
-            }
-        })
+        renderer.setListener()
         // Add the places to the ClusterManager
         clusterManager.addItems(places)
         clusterManager.cluster()
@@ -183,29 +190,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
     // [END maps_android_add_map_codelab_ktx_add_circle]
-
-    private val bicycleIcon: BitmapDescriptor by lazy {
-        val color = ContextCompat.getColor(this, R.color.colorPrimary)
-        BitmapHelper.vectorToBitmap(this, R.drawable.ic_directions_bike_black_24dp, color)
-    }
-
-    // [START maps_android_add_map_codelab_ktx_add_markers]
-    /**
-     * Adds markers to the map. These markers won't be clustered.
-     */
-    private fun addMarkers(googleMap: GoogleMap) {
-        places.forEach { place ->
-            val marker = googleMap.addMarker {
-                title(place.name)
-                position(place.latLng)
-                icon(bicycleIcon)
-            }
-            // Set place as the tag on the marker object so it can be referenced within
-            // MarkerInfoWindowAdapter
-            marker.tag = place
-        }
-    }
-    // [END maps_android_add_map_codelab_ktx_add_markers]
 
     companion object {
         val TAG = MainActivity::class.java.simpleName

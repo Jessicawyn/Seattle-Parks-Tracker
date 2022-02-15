@@ -1,10 +1,14 @@
 package com.google.codelabs.buildyourfirstmap.adapter
 
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.codelabs.buildyourfirstmap.R
 import com.google.codelabs.buildyourfirstmap.place.Place
@@ -24,6 +28,7 @@ class ItemAdapter(
     class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         val parkNameView: TextView = view.findViewById(R.id.parkName)
         val parkAddressView: TextView = view.findViewById(R.id.parkAddress)
+        val parkItem: ConstraintLayout = view.findViewById(R.id.parkItem)
     }
 
     /**
@@ -40,10 +45,15 @@ class ItemAdapter(
     /**
      * Replace the contents of a view (invoked by the layout manager)
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = dataset[position]
         holder.parkNameView.text = item.name
         holder.parkAddressView.text = item.address
+        if (item.visited)
+            holder.parkItem.setBackgroundColor(context.resources.getColor(R.color.colorAccent, context.theme))
+        else
+            holder.parkItem.setBackgroundColor(Color.WHITE)
     }
 
     /**

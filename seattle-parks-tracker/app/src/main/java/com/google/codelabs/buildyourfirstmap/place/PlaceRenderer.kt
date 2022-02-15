@@ -16,6 +16,7 @@ package com.google.codelabs.buildyourfirstmap.place
 
 import android.content.Context
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.Marker
@@ -31,22 +32,53 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer
 class PlaceRenderer(
     private val context: Context,
     map: GoogleMap,
-    clusterManager: ClusterManager<Place>
+    private val clusterManager: ClusterManager<Place>
 ) : DefaultClusterRenderer<Place>(context, map, clusterManager) {
+    fun setListener() {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        clusterManager.markerCollection.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
+            override fun onInfoWindowClick(marker: Marker?) {
+                val place = marker?.tag as? Place ?: return
+                place.visited = !place.visited
+                marker.setIcon(placeIcon(place))
+                marker.showInfoWindow()
+                val editor = preferences.edit()
+                if (place.visited && !preferences.getBoolean(place.locID, false))
+                    editor.putBoolean(place.locID, true)
+                else if(!place.visited && preferences.getBoolean(place.locID, false))
+                    editor.remove(place.locID)
+                editor.apply()
+            }
+        })
+    }
 
     /**
      * The icon to use for each cluster item
      */
-    private val bicycleIcon: BitmapDescriptor by lazy {
+    private val unvisitedParkIcon: BitmapDescriptor by lazy {
         val color = ContextCompat.getColor(context,
             R.color.colorPrimary
         )
         BitmapHelper.vectorToBitmap(
             context,
-            R.drawable.ic_directions_bike_black_24dp,
+            R.drawable.ic_baseline_nature_people_24,
             color
         )
     }
+
+    private val visitedParkIcon: BitmapDescriptor by lazy {
+        val color = ContextCompat.getColor(context,
+            R.color.colorAccent
+        )
+        BitmapHelper.vectorToBitmap(
+            context,
+            R.drawable.ic_baseline_nature_people_24,
+            color
+        )
+    }
+
+    private fun placeIcon(item: Place) : BitmapDescriptor = if (item.visited)
+        visitedParkIcon else unvisitedParkIcon
 
     /**
      * Method called before the cluster item (i.e. the marker) is rendered. This is where marker
@@ -55,7 +87,7 @@ class PlaceRenderer(
     override fun onBeforeClusterItemRendered(item: Place, markerOptions: MarkerOptions) {
         markerOptions.title(item.name)
             .position(item.latLng)
-            .icon(bicycleIcon)
+            .icon(placeIcon(item))
     }
 
     /**

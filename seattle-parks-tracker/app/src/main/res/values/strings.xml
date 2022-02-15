@@ -16,4 +16,6 @@
 
 <resources>
     <string name="app_name">Seattle Parks Tracker</string>
+    <string name="parks_list">Parks List</string>
+    <string name="parks_map">Parks Map</string>
 </resources>
